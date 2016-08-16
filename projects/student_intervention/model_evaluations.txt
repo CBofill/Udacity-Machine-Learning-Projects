@@ -1,0 +1,105 @@
+Gaussian Naive Bayes (GaussianNB) Learning: O(n) (I think), Prediciting: "almost" O(1)
+-Describe one real-world application in industry where the model can be applied.
+Classifying a person's cognitive activity based on brain imaging, as described here:
+https://www.cs.cmu.edu/~tom/10601_sp09/lectures/NBayes2_2-2-2009-ann.pdf
+-What are the strengths of the model; when does it perform well? 
+Requires small amount of training data; learners and classifiers relatively fast; "The decoupling of the class 
+conditional feature distributions means that each distribution can be independently estimated as a one dimensional 
+distribution. This in turn helps to alleviate problems stemming from the curse of dimensionality"; adapts well to 
+new data, i.e. does well in real time; handles missing data well;
+-What are the weaknesses of the model; when does it perform poorly?
+Bad estimator; bad for regression; assumes conditional independence, so it can do poorly when features are strongly 
+dependent; greater bias, lower variance (vs LR)
+-What makes this model a good candidate for the problem, given what you know about the data?
+Our small data set relative to features suggests NB could be a good choice, but the assumption that the features are 
+gaussian is odd, especially considering none of them are continuous.
+
+Decision Trees  Learning: __, Predicting: O(log n)
+-Describe one real-world application in industry where the model can be applied.
+"Decision trees have been used for the detection of physical particles", i.e. quarks. Source, along with many other 
+examples, here:
+http://www.cbcb.umd.edu/~salzberg/docs/murthy_thesis/survey/node32.html
+-What are the strengths of the model; when does it perform well? 
+Does feature selection automatically; requires little effort for normalizing data; not sensitive to outliers; complex 
+decision boundary, i.e. works well with non-linear relationships; able to handle multi-output problems; easy to 
+interpret, good for visualizing or otherwise explaining decisions; 
+-What are the weaknesses of the model; when does it perform poorly?
+can easily overfit without post-pruning (not available in sklearn); unstable, i.e. small changes in data can result in 
+a completely different tree; prone to local optima (can be mitigated with ensemble methods); 
+-What makes this model a good candidate for the problem, given what you know about the data?
+With so many features this might be good, esp. since it's unlikely there's a linear relationship. Would need some 
+additional methodology to avoid overfitting, e.g. random forest
+
+Ensemble Methods (Bagging, AdaBoost, Random Forest, Gradient Boosting)
+-Describe one real-world application in industry where the model can be applied.
+These aren't models themselves, so their use is determined by the estimator their used on. 
+-What are the strengths of the model; when does it perform well? 
+Reduce the variance in base estimator; "as they provide a way to reduce overfitting, bagging methods work best with 
+strong and complex models (e.g., fully developed decision trees), in contrast with boosting methods which usually work 
+best with weak models (e.g., shallow decision trees)." Using Random Forest "the bias of the forest usually slightly 
+increases...but...its variance also decreases...yielding an overall better model."
+-What are the weaknesses of the model; when does it perform poorly?
+Cannot fix problems in the model they're being used on, e.g. if the base model overfits then boosting will overfit; 
+Gradient Boosting doesn't scale well, efficienty-wise; 
+-What makes this model a good candidate for the problem, given what you know about the data?
+If I'm using an estimator that's appropriate to use an ensemble method on, the only concern would be efficiency.
+
+K-Nearest Neighbors (KNeighbors) Learning: O(1), Predicting: O(n^2)
+-Describe one real-world application in industry where the model can be applied.
+"The modern [CCTV] systems are now able to use k-nearest neighbor for visual pattern recognition to scan and detect 
+hidden packages in the bottom bin of a shopping cart at check-out." Source doesn't go into much depth regarding 
+implementation, but gives a couple other examples of KNN use in a retail setting. Found here:
+http://www.dummies.com/programming/big-data/data-science/solving-real-world-problems-with-nearest-neighbor-algorithms/
+-What are the strengths of the model; when does it perform well? 
+Non-parametric, the decision boundary can take any form; "When you are solving a problem which directly focuses on 
+finding similarity between observations, K-NN does better because of its inherent nature to optimize locally." 
+Weaknesses regarding speed can be reduced using various methods.
+-What are the weaknesses of the model; when does it perform poorly?
+Slow with lots of data;  doesn't weigh attributes, typically; slow during prediction; can't handle missing data; 
+need to scale features to each other
+-What makes this model a good candidate for the problem, given what you know about the data?
+This could perhaps work with good feature selection, but would require some amount of work weighing the features 
+beforehand (e.g. PCA). 
+
+Stochastic Gradient Descent (SGDC) Learning: basically O(n), Predicting: 
+-Describe one real-world application in industry where the model can be applied.
+Anywhere SVM, LR, or ANN is used, and probably more. This isn't a model but a training method.
+-What are the strengths of the model; when does it perform well? 
+Works well with large amounts of data, is very efficient; basically a way of optimizing some other methods, e.g. SVM
+-What are the weaknesses of the model; when does it perform poorly?
+sensitive to feature scaling, have to normalize data; "requires a number of hyperparameters such as the regularization 
+parameter and the number of iterations"
+-What makes this model a good candidate for the problem, given what you know about the data?
+We don't have a huge amount of data, but if using an SVM turns out to be a good choice it might be a good idea to apply
+SGDC over it.
+
+Support Vector Machines (SVM)
+-Describe one real-world application in industry where the model can be applied.
+Text categorization, e.g. classifying Usenet News messages as computation, religion, statistics, etc. As described, 
+along with other examples, here:
+https://arxiv.org/pdf/math/0612817.pdf
+-What are the strengths of the model; when does it perform well? 
+handling large feature space; non-linear relationships; ignores outliers, based on edge cases only; use of kernel means 
+high versatility
+-What are the weaknesses of the model; when does it perform poorly?
+when classes are not seperable, or there is not enough margin to fit a hyperplane between; not efficient with large n; 
+-What makes this model a good candidate for the problem, given what you know about the data?
+
+
+Logistic Regression
+-Describe one real-world application in industry where the model can be applied.
+"Predicting an individual’s turnout (or support) likelihood for a particular cause, party or candidate as well as 
+data-driven voter segmentation." For the purpose of efficient targeting of voters for mobilization. Source:
+https://arxiv.org/pdf/1311.7326.pdf
+-What are the strengths of the model; when does it perform well? 
+When the predictors tend to a linear relationship; large number of features relative to samples; gives output as a 
+probability, or confidence, which can be useful for analysis; handles some feature intercorrelation well, doesn't need 
+much feature engineering; when the output is roughly 50/50 +/-; 
+-What are the weaknesses of the model; when does it perform poorly?
+When the output is not dichotomous (though there are ways of making it deal with this, which scikit can implement); 
+when the data has high separation; lower bias, greater variance (vs NB); "when you have a large number of features and 
+a good chunk of missing data"
+-What makes this model a good candidate for the problem, given what you know about the data?
+It probably isn't, we only have 300 samples total, not just failed, for 30 features. We might be able to be smart 
+about feature selection, but it's still a very small number of samples. Having the output as a probability of 
+classification could be quite useful in this context, though.
