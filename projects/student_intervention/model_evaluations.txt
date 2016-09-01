@@ -12,7 +12,7 @@ Bad estimator; bad for regression; assumes conditional independence, so it can d
 dependent; greater bias, lower variance (vs LR)
 -What makes this model a good candidate for the problem, given what you know about the data?
 Our small data set relative to features suggests NB could be a good choice, but the assumption that the features are 
-gaussian is odd, especially considering none of them are continuous.
+gaussian is odd, especially considering not all of them are continuous.
 
 Decision Trees  Learning: __, Predicting: O(log n)
 -Describe one real-world application in industry where the model can be applied.
