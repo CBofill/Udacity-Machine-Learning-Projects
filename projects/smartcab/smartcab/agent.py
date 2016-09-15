@@ -1,3 +1,4 @@
+#coding:utf-8
 import random
 from environment import Agent, Environment
 from planner import RoutePlanner
@@ -11,16 +12,31 @@ class LearningAgent(Agent):
 		self.color = 'red'  # override color
 		self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
         # TODO: Initialize any additional variables here
+		# Initialize Q Table and parameters
 		self.Q = {None:{None:2.}}
-		self.alpha = 0.1
+		self.alpha = 0.8
 		self.gamma = 0.01
 		self.epsilon =  0.5
 		self.decay_rate = 0.005
-		self.last_update = (None,None,0.0)
-
+		
+		# Initialize state tracking
+		self.last_state = None
+		self.last_action = None
+		self.last_reward = 0.0
+		
+		# Initialize performance metric tracking
+		self.cum_reward = 0.0
+		self.successes = 0
+		self.rewards = 0
+		self.penalties = 0
+		self.trial_count = 0
+		
 	def reset(self, destination=None):
 		self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
+		
+		# Track number of trials
+		self.trial_count += 1
 
 	def update(self, t):
 		# Gather inputs
@@ -67,15 +83,20 @@ class LearningAgent(Agent):
         
 		# Execute action and get reward 
 		reward = self.env.act(self, action)
+		
+		# Update metrics
+		self.update_metrics(reward)
 
         # TODO: Learn policy based on state, action, reward
 
 		# Determine Q estimate; Q(s,a) = (1-α)*Q(s,a) + α*(reward + γ*Q(ŝ,â))
-		X = self.last_update[2] + self.gamma * self.Q[self.state][max_Q] # X = reward + γ*Q(ŝ,â)
-		self.Q[self.last_update[0]][self.last_update[1]] = (1-self.alpha)*self.Q[self.last_update[0]][self.last_update[1]] + self.alpha*X # Q(s,a) = (1-α)*Q(s,a) + α*X
+		X = self.last_reward + self.gamma * self.Q[self.state][max_Q] # X = reward + γ*Q(ŝ,â)
+		self.Q[self.last_state][self.last_action] = (1-self.alpha)*self.Q[self.last_state][self.last_action] + self.alpha*X # Q(s,a) = (1-α)*Q(s,a) + α*X
 		
 		# Store s,a,reward for next Q estimate
-		self.last_update = (self.state,action,reward)
+		self.last_state = self.state
+		self.last_action = action
+		self.last_reward = reward
 		
 		# Decay exploration rate
 		self.epsilon -= self.decay_rate
@@ -83,10 +104,24 @@ class LearningAgent(Agent):
 		print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
 		#print "State is {}, maxQ is {}, Q table is {}".format(self.state,max_Q,self.Q[self.state])
 	
+	# Performance metric tracking
+	def update_metrics(self,reward):
+		self.cum_reward += reward
+		self.rewards += 1
+		if reward < 0:
+			self.penalties += 1
+		if reward == 12:
+			self.successes += 1
+	
 	# Print every state and the corresponding Q values of each action
 	def print_Q(self):
 		for key in self.Q:
 			print key, " ",self.Q[key]
+
+	# Print performance metrics
+	def print_metrics(self):
+		penalty_ratio = float(self.penalties)/self.rewards
+		print "Reached goal {} of {} trials with cumulative reward of {} and a penalties to rewards ratio of {}".format(self.successes,self.trial_count,self.cum_reward,penalty_ratio)
 		
 
 def run():
@@ -107,6 +142,9 @@ def run():
 	
 	# Print final Q table
 	#a.print_Q()
+	
+	# Print performance metrics
+	#a.print_metrics()
 
 
 if __name__ == '__main__':
